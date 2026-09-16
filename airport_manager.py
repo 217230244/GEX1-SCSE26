@@ -64,20 +64,20 @@ flights = {
 
 ## Logic to find if a flight exists
 def find_flight(flights, flight_number):
-    normalized = str(flight_number).strip().upper()
+    flight_number = flight_number.strip().upper()
 
-    if normalized in flights:
-        return normalized
+    if flight_number in flights:
+        return flight_number
 
     return None
 
 
 ## Logic to find if a passenger exists
 def passenger_exists(passengers, passenger_name):
-    target = str(passenger_name).strip().casefold()
+    passenger_name = passenger_name.strip().lower()
 
     for passenger in passengers:
-        if str(passenger).strip().casefold() == target:
+        if passenger.strip().lower() == passenger_name:
             return True
 
     return False
@@ -95,30 +95,24 @@ def check_in_passenger(
     if flight_key is None:
         return "FLIGHT_NOT_FOUND"
 
-    normalized_name = str(passenger_name).strip()
+    passenger_name = passenger_name.strip()
 
-    if normalized_name == "":
+    if passenger_name == "":
         return "EMPTY_NAME"
 
-    normalized_name = normalized_name.title()
+    passenger_name = passenger_name.title()
     flight = flights[flight_key]
 
-    if passenger_exists(flight["passengers"], normalized_name):
+    if passenger_exists(flight["passengers"], passenger_name):
         return "DUPLICATE"
 
     if len(flight["passengers"]) >= flight["capacity"]:
         return "FULL"
 
-    destination = str(flight["destination"]).strip().casefold()
-    restricted = {
-        str(item).strip().casefold()
-        for item in restricted_destinations
-    }
-
-    if destination in restricted:
+    if flight["destination"] in restricted_destinations:
         return "RESTRICTED"
 
-    flight["passengers"].append(normalized_name)
+    flight["passengers"].append(passenger_name)
     return "OK"
 
 
@@ -133,11 +127,11 @@ def remove_passenger(
     if flight_key is None:
         return "FLIGHT_NOT_FOUND"
 
-    target = str(passenger_name).strip().casefold()
+    passenger_name = passenger_name.strip().lower()
     passengers = flights[flight_key]["passengers"]
 
-    for index, passenger in enumerate(passengers):
-        if str(passenger).strip().casefold() == target:
+    for index in range(len(passengers)):
+        if passengers[index].strip().lower() == passenger_name:
             passengers.pop(index)
             return "OK"
 
@@ -156,16 +150,12 @@ def change_gate(
     if flight_key is None:
         return "FLIGHT_NOT_FOUND"
 
-    gate = str(new_gate).strip().upper()
-    valid_gates = {
-        str(item).strip().upper()
-        for item in allowed_gates
-    }
+    new_gate = new_gate.strip().upper()
 
-    if gate not in valid_gates:
+    if new_gate not in allowed_gates:
         return "INVALID_GATE"
 
-    flights[flight_key]["gate"] = gate
+    flights[flight_key]["gate"] = new_gate
     return "OK"
 
 
@@ -177,7 +167,7 @@ def flight_status(flight):
     if capacity <= 0:
         return "FULL"
 
-    percentage = (passenger_count / capacity) * 100
+    percentage = passenger_count / capacity * 100
 
     if percentage >= 100:
         return "FULL"
